@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: #0b0b10;
+  color: #f5f5f7;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Fundo com "blobs" gradientes suaves e animados, atrás de todo o app. */
+.blob-field {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(70px);
+  opacity: 0.35;
+  will-change: transform;
+}
+
+.blob-amber {
+  width: 55vmax;
+  height: 55vmax;
+  top: -18vmax;
+  left: -12vmax;
+  background: radial-gradient(circle, #f2c744 0%, transparent 70%);
+  animation: blob 22s ease-in-out infinite;
+}
+
+.blob-pink {
+  width: 50vmax;
+  height: 50vmax;
+  bottom: -20vmax;
+  right: -14vmax;
+  background: radial-gradient(circle, #ec4899 0%, transparent 70%);
+  animation: blob 26s ease-in-out infinite reverse;
+}
+
+.blob-violet {
+  width: 40vmax;
+  height: 40vmax;
+  bottom: 10vmax;
+  left: -10vmax;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+  animation: blob 30s ease-in-out infinite;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
+}
+
+.card-black {
+  position: relative;
+  background: linear-gradient(155deg, #201f28, #0a0a0d);
+  color: #fafafa;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+
+.card-white {
+  position: relative;
+  background: #fdfdfd;
+  color: #16161a;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.5);
+}
+
+.card-white.selected {
+  outline: 3px solid #f2c744;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(242, 199, 68, 0.25), 0 10px 24px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* Selo de canto tipo "CAF", igual as cartas físicas de CAH. */
+.card-black::after,
+.card-white::after {
+  content: "CAF";
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.65rem;
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  opacity: 0.35;
+}
+
+.card-white::after {
+  color: #16161a;
+}
+
+.tap-scale {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.tap-scale:active {
+  transform: scale(0.96);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ffd764, #f2a544);
+  color: #16130a;
+  box-shadow: 0 12px 24px -10px rgba(242, 165, 68, 0.55);
+}
+
+.animate-in {
+  animation: pop-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Confetes CSS-only, em explosão, pra celebrar o vencedor da rodada/partida.
+ * Cada peça recebe --dx/--dy/--rot via inline style (ver componente Confetti). */
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 14px;
+  border-radius: 1px;
+  animation: confetti-burst 900ms cubic-bezier(0.15, 0.8, 0.35, 1) forwards;
+}
+
+@keyframes confetti-burst {
+  0% {
+    transform: translate(-50%, -50%) translate(0, 0) rotate(0deg) scale(0.5);
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) translate(var(--dx, 0px), var(--dy, 0px)) rotate(var(--rot, 0deg))
+      scale(1);
+    opacity: 0;
+  }
+}
