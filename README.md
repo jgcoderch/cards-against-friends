@@ -81,9 +81,18 @@ Configuração típica em qualquer uma dessas plataformas:
 
 Como as salas ficam em memória, cada novo deploy (restart do processo) apaga as salas ativas — isso é esperado nessa v1.
 
+## Testes automatizados
+
+```bash
+npm test          # roda a suíte uma vez
+npm run test:watch # modo watch, reroda ao salvar
+```
+
+Usa [Vitest](https://vitest.dev). A suíte cobre a lógica de sala/rodada em `server/rooms.js` (a parte mais arriscada do projeto — pontuação, temporizadores, condição de vitória, reconexão) e a integridade dos baralhos em `server/cards.js` (sem cartas vazias/duplicadas, tamanhos esperados). Ainda não há testes de componentes React — ver limitações abaixo.
+
 ## Limitações da v1 (próximos passos sugeridos)
 
 - Sem persistência: reiniciar o servidor apaga todas as salas.
 - Se o juiz cair no meio da rodada (e não reconectar), o servidor pula direto pra tela de revelação para não travar o jogo. Jogadores comuns reconectam automaticamente (o client reenvia `join_room` sozinho quando o socket cai e volta — comum em celular ao bloquear a tela).
 - Sem suporte a cartas pretas com múltiplas lacunas ("pick 2") — todas as cartas de exemplo são "pick 1".
-- Sem testes automatizados.
+- Testes automatizados cobrem só a lógica de servidor (`server/`); a UI React ainda não tem testes de componente/integração.
