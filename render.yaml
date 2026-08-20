@@ -12,8 +12,12 @@ services:
     startCommand: npm start
     healthCheckPath: /
     envVars:
+      # Node 22+ tem WebSocket nativo, que o cliente do Supabase precisa
+      # (em Node < 22 ele falha mesmo com o pacote `ws` instalado, porque o
+      # rastreamento de dependencias do build do Next as vezes nao pega o
+      # require dinamico que a lib do Supabase faz).
       - key: NODE_VERSION
-        value: 20.18.1
+        value: 22.11.0
       # sync: false = o Render pede pra você colar o valor na hora de criar o
       # Blueprint, sem guardar o segredo neste arquivo. Pegue os valores em
       # Project Settings -> API no seu projeto Supabase. Sem eles, o app
