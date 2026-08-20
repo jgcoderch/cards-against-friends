@@ -1,0 +1,16 @@
+# Blueprint do Render (https://render.com/docs/blueprint-spec).
+# No dashboard: New + -> Blueprint -> selecione este repositório.
+# O Render lê este arquivo e cria o serviço abaixo automaticamente.
+services:
+  - type: web
+    name: cards-against-friends
+    runtime: node
+    plan: free
+    branch: develop
+    autoDeploy: true
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.1

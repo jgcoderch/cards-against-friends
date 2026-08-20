@@ -81,6 +81,22 @@ Configuração típica em qualquer uma dessas plataformas:
 
 Como as salas ficam em memória, cada novo deploy (restart do processo) apaga as salas ativas — isso é esperado nessa v1.
 
+### Deploy no Render (recomendado)
+
+O repo já tem um `render.yaml` (Blueprint) configurado pra criar um Web Service free que acompanha a branch `develop` — é onde a gente testa as mudanças jogando com os amigos antes de levar pra `main`.
+
+1. Crie conta em [render.com](https://render.com) (dá pra logar direto com GitHub, sem cartão de crédito no plano free).
+2. No dashboard: **New +** → **Blueprint**.
+3. Autorize o Render a acessar o repositório `cards-against-friends` no GitHub e selecione ele.
+4. O Render lê o `render.yaml` sozinho e já sugere criar o serviço `cards-against-friends` na branch `develop`. Confirme.
+5. Espera o primeiro build/deploy (alguns minutos) — a URL pública aparece no dashboard (algo como `https://cards-against-friends.onrender.com`).
+
+Depois disso, **todo push na branch `develop` faz redeploy automático** — dá pra jogar com os amigos, ajustar o que não gostaram, empurrar de novo, e a URL já atualiza sozinha.
+
+**Sobre o plano free**: o serviço "dorme" depois de ~15 min sem tráfego, e a primeira requisição depois disso demora uns 30-50s pra acordar (é só avisar a galera "abre o link e espera um pouco" na primeira vez). Sem custo, sem cartão cadastrado.
+
+Quando algo for validado em `develop` e vocês quiserem estabilizar, é só dar merge pra `main` (e, se quiser, criar um segundo Web Service no Render apontando pra `main`, pra ter uma URL "estável" separada da de testes).
+
 ## Testes automatizados
 
 ```bash
