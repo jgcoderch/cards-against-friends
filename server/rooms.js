@@ -63,6 +63,7 @@ class Room {
     this.matchWinner = null; // { playerId, playerName, score, tiedPlayers } — só na fase "gameover"
     this.phaseDeadline = null; // epoch ms em que a fase atual expira (null = sem timer)
     this.timeoutHandle = null; // handle do setTimeout do temporizador atual (uso interno do server.js)
+    this.resultRecorded = false; // evita salvar a mesma partida 2x no Hall da Fama (uso interno do server.js)
     this.emptySince = null;
   }
 
@@ -171,6 +172,7 @@ class Room {
     this.winner = null;
     this.matchWinner = null;
     this.roundNumber = 1;
+    this.resultRecorded = false;
     this.phase = "submitting";
     this.phaseDeadline = this.submitDeadline();
   }
@@ -328,6 +330,7 @@ class Room {
     this.matchWinner = null;
     this.roundNumber = 0;
     this.phaseDeadline = null;
+    this.resultRecorded = false;
     for (const player of this.playerList) {
       player.score = 0;
       player.hand = [];

@@ -244,6 +244,20 @@ describe("Room — ciclo da partida", () => {
     }
   });
 
+  it("resultRecorded começa falso, fica marcável, e reseta a cada novo jogo (evita salvar 2x no Hall da Fama)", () => {
+    expect(room.resultRecorded).toBe(false);
+
+    room.startGame("casual", { winScore: 1 });
+    expect(room.resultRecorded).toBe(false);
+
+    room.resultRecorded = true; // é isso que o server.js faz ao salvar no Supabase
+    room.resetToLobby();
+    expect(room.resultRecorded).toBe(false);
+
+    room.startGame("casual", { winScore: 1 });
+    expect(room.resultRecorded).toBe(false);
+  });
+
   it("buildStateFor só revela a própria mão e esconde as submissões até a fase de julgamento", () => {
     room.startGame("casual", {});
     const nonJudge = room.playerList.find((p) => p.id !== room.judgeId);
