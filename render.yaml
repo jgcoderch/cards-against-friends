@@ -14,3 +14,11 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 20.18.1
+      # sync: false = o Render pede pra você colar o valor na hora de criar o
+      # Blueprint, sem guardar o segredo neste arquivo. Pegue os valores em
+      # Project Settings -> API no seu projeto Supabase. Sem eles, o app
+      # funciona normalmente — só o Hall da Fama fica desativado.
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

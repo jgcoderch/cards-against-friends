@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useGame } from "../../providers";
+import { Avatar } from "@/components/Avatar";
 import type {
   CardData,
   DeckInfo,
@@ -149,27 +151,6 @@ export default function RoomPage() {
 }
 
 /* ---------- pequenos blocos reutilizáveis ---------- */
-
-function initials(name: string) {
-  return name.trim().slice(0, 2).toUpperCase() || "?";
-}
-
-function colorForId(id: string) {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0;
-  return `hsl(${hash % 360} 65% 52%)`;
-}
-
-function Avatar({ id, name }: { id: string; name: string }) {
-  return (
-    <span
-      className="font-display flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-inner"
-      style={{ backgroundColor: colorForId(id) }}
-    >
-      {initials(name)}
-    </span>
-  );
-}
 
 /** Contagem regressiva client-side baseada num epoch ms vindo do servidor. */
 function Countdown({ deadline }: { deadline: number | null }) {
@@ -809,6 +790,10 @@ function GameOverView({
       ) : (
         <p className="mt-auto text-sm text-white/50">Esperando o dono da sala reiniciar...</p>
       )}
+
+      <Link href="/hall-da-fama" className="text-sm text-white/50 underline">
+        🏆 Ver Hall da Fama
+      </Link>
     </div>
   );
 }

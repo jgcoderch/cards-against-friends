@@ -1,7 +1,11 @@
+const { loadEnvConfig } = require("@next/env");
+loadEnvConfig(process.cwd()); // carrega .env.local/.env antes de qualquer módulo que leia process.env
+
 const { createServer } = require("http");
 const next = require("next");
 const { Server } = require("socket.io");
 const { RoomManager, MIN_PLAYERS_TO_START } = require("./server/rooms");
+const { recordMatchResult } = require("./server/supabase");
 
 const dev = process.env.NODE_ENV !== "production";
 const port = parseInt(process.env.PORT || "3000", 10);
@@ -42,10 +46,17 @@ function scheduleRoomTimer(io, room) {
   }, delay);
 }
 
-/** Broadcast + (re)agendamento do timer num só lugar, pra nunca esquecer um dos dois. */
+/** Broadcast + (re)agendamento do timer + registro no Hall da Fama num só
+ * lugar, pra nunca esquecer nenhum dos três quando o estado da sala muda. */
 function syncRoom(io, room) {
   broadcastRoom(io, room);
   scheduleRoomTimer(io, room);
+  if (room.phase === "gameover" && !room.resultRecorded) {
+    room.resultRecorded = true;
+    recordMatchResult(room).catch((err) =>
+      console.error("Falha ao salvar resultado da partida:", err)
+    );
+  }
 }
 
 app.prepare().then(() => {

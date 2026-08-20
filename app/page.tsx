@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useGame } from "./providers";
 
@@ -87,6 +88,9 @@ export default function HomePage() {
           >
             Entrar com código
           </button>
+          <Link href="/hall-da-fama" className="mt-1 text-center text-sm text-white/50 underline">
+            🏆 Hall da Fama
+          </Link>
         </div>
       )}
 

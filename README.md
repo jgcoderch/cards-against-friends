@@ -1,6 +1,6 @@
 # Cards Against Friends
 
-Jogo multiplayer estilo Cards Against Humanity, com baralho de conteúdo próprio. Next.js (App Router) + servidor Socket.io customizado, salas mantidas em memória (sem banco de dados).
+Jogo multiplayer estilo Cards Against Humanity, com baralho de conteúdo próprio. Next.js (App Router) + servidor Socket.io customizado, salas mantidas em memória. Tem um banco de dados opcional (Supabase) só pro **Hall da Fama** — o placar histórico entre partidas (ver seção própria abaixo).
 
 ## Rodando localmente
 
@@ -61,6 +61,24 @@ const DECKS = {
 
 Não há limite de tamanho por baralho — cada um embaralha e, se acabar, reaproveita as cartas já descartadas.
 
+## Banco de dados (Hall da Fama)
+
+Salas e rodadas continuam 100% em memória (isso não muda). Mas quando uma partida termina (fase `gameover`), o resultado — sala, baralho usado, jogadores e pontuações, quem venceu — é salvo no [Supabase](https://supabase.com) (Postgres hospedado). Isso alimenta o **Hall da Fama** (`/hall-da-fama`): um placar histórico global com vitórias e partidas jogadas por jogador, que sobrevive a restart do servidor e a novos deploys — diferente do resto do estado do jogo.
+
+**Por que Supabase em vez de SQLite local**: o plano free do Render (onde fazemos deploy) tem disco efêmero — qualquer arquivo local (tipo um `.sqlite`) some a cada redeploy/restart. Um banco hospedado separado do processo da app é a única forma de ter persistência de verdade nesse setup.
+
+**O app funciona inteiro sem o banco configurado** — é só o Hall da Fama que fica desativado (mostra um aviso amigável em vez de quebrar). Ninguém precisa configurar isso pra jogar.
+
+### Configurando
+
+1. Crie um projeto grátis em [supabase.com](https://supabase.com).
+2. No SQL Editor do projeto, rode o script `supabase/schema.sql` deste repo (cria a tabela `matches`).
+3. Em **Project Settings → API**, copie a **Project URL** e a **service_role key** (não a `anon` — o backend precisa da service role pra escrever ignorando RLS).
+4. Localmente: copie `.env.example` pra `.env.local` e preencha `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+5. No Render: essas duas variáveis já estão declaradas no `render.yaml` (com `sync: false`, ou seja, sem guardar o segredo no repo) — o dashboard pede pra colar os valores na hora de criar o Blueprint, ou dá pra adicionar depois em **Environment**.
+
+A `service_role key` tem acesso total ao projeto Supabase — nunca exponha ela no cliente. Ela só é usada aqui dentro de `server/supabase.js` e `app/api/hall-da-fama/route.ts`, ambos server-only.
+
 ## Deploy
 
 Esse projeto usa um **servidor HTTP customizado** (`server.js`) que integra Next.js e Socket.io no mesmo processo Node — não é uma app 100% serverless. Isso significa que **não dá pra fazer deploy no Vercel do jeito padrão** (o modelo de funções serverless dele não sustenta conexões WebSocket persistentes nem um `server.js` de longa duração).
@@ -77,7 +95,7 @@ Configuração típica em qualquer uma dessas plataformas:
 - **Build command**: `npm install && npm run build`
 - **Start command**: `npm start`
 - **Porta**: o servidor lê `process.env.PORT` automaticamente (a maioria das plataformas injeta isso sozinha)
-- Não precisa de banco de dados nem variáveis de ambiente — tudo roda em memória
+- Variáveis de ambiente são opcionais — só necessárias pro Hall da Fama (ver seção "Banco de dados" acima)
 
 Como as salas ficam em memória, cada novo deploy (restart do processo) apaga as salas ativas — isso é esperado nessa v1.
 
@@ -88,7 +106,7 @@ O repo já tem um `render.yaml` (Blueprint) configurado pra criar um Web Service
 1. Crie conta em [render.com](https://render.com) (dá pra logar direto com GitHub, sem cartão de crédito no plano free).
 2. No dashboard: **New +** → **Blueprint**.
 3. Autorize o Render a acessar o repositório `cards-against-friends` no GitHub e selecione ele.
-4. O Render lê o `render.yaml` sozinho e já sugere criar o serviço `cards-against-friends` na branch `develop`. Confirme.
+4. O Render lê o `render.yaml` sozinho e já sugere criar o serviço `cards-against-friends` na branch `develop`. Ele vai pedir pra colar `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` — pode deixar em branco se ainda não configurou o Supabase (dá pra preencher depois em Environment). Confirme.
 5. Espera o primeiro build/deploy (alguns minutos) — a URL pública aparece no dashboard (algo como `https://cards-against-friends.onrender.com`).
 
 Depois disso, **todo push na branch `develop` faz redeploy automático** — dá pra jogar com os amigos, ajustar o que não gostaram, empurrar de novo, e a URL já atualiza sozinha.
@@ -108,7 +126,7 @@ Usa [Vitest](https://vitest.dev). A suíte cobre a lógica de sala/rodada em `se
 
 ## Limitações da v1 (próximos passos sugeridos)
 
-- Sem persistência: reiniciar o servidor apaga todas as salas.
+- Sem persistência de salas: reiniciar o servidor apaga todas as salas em andamento (só o resultado final das partidas fica salvo, no Hall da Fama — ver seção "Banco de dados").
 - Se o juiz cair no meio da rodada (e não reconectar), o servidor pula direto pra tela de revelação para não travar o jogo. Jogadores comuns reconectam automaticamente (o client reenvia `join_room` sozinho quando o socket cai e volta — comum em celular ao bloquear a tela).
 - Sem suporte a cartas pretas com múltiplas lacunas ("pick 2") — todas as cartas de exemplo são "pick 1".
 - Testes automatizados cobrem só a lógica de servidor (`server/`); a UI React ainda não tem testes de componente/integração.
