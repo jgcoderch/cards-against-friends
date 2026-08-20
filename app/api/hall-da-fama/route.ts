@@ -24,15 +24,15 @@ export async function GET() {
     return NextResponse.json({ configured: false, leaderboard: [] });
   }
 
-  const { data, error, count } = await client
+  const { data, error } = await client
     .from("matches")
-    .select("players, winner_player_id", { count: "exact" })
+    .select("players, winner_player_id")
     .order("created_at", { ascending: true })
     .limit(2000);
 
   if (error) {
     return NextResponse.json(
-      { configured: true, leaderboard: [], error: error.message, debugCount: count },
+      { configured: true, leaderboard: [], error: error.message },
       { status: 500 }
     );
   }
@@ -58,13 +58,5 @@ export async function GET() {
     .sort((a, b) => b.wins - a.wins || b.matches - a.matches)
     .slice(0, 50);
 
-  // TODO(temporário): campos de debug pra investigar por que o leaderboard
-  // vem vazio mesmo com linhas na tabela — remover depois de resolver.
-  return NextResponse.json({
-    configured: true,
-    leaderboard,
-    debugCount: count,
-    debugRawLength: data?.length ?? null,
-    debugSample: (data ?? []).slice(0, 2),
-  });
+  return NextResponse.json({ configured: true, leaderboard });
 }
