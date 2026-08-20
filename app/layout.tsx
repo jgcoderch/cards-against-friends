@@ -13,6 +13,11 @@ const fredoka = Fredoka({
 export const metadata: Metadata = {
   title: "Cards Against Friends",
   description: "Jogo de cartas multiplayer estilo Cards Against Humanity, com baralho próprio.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Cards Against Friends",
+  },
 };
 
 export const viewport: Viewport = {
